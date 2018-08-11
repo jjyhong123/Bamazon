@@ -1,7 +1,6 @@
 var mysql = require('mysql');
 var inquirer = require('inquirer');
 require("dotenv").config();
-var password = require("./password.js");
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -13,7 +12,7 @@ var connection = mysql.createConnection({
     user: "root",
 
     // Your password
-    password: password.password,
+    password: process.env.PASSWORD,
     database: "bamazon_db"
 });
 
