@@ -22,7 +22,7 @@ https://drive.google.com/file/d/1ZAm1VcTH2zMxop6D-497R-fJzgM7IEDE/view?usp=shari
 
 ## bamazonManager.js
 ### Overview
-Running this application displays a list of available actions: 
+* Running this application displays a list of available actions: 
     * View products for sale
         * Lists the id, name, department, price, and quantity of each item in the *products* table.  
     * View low inventory
