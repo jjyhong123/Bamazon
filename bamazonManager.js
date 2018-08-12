@@ -1,7 +1,9 @@
+// Incorporate npm packages
 var mysql = require('mysql');
 var inquirer = require('inquirer');
 require("dotenv").config();
 
+// Connection information for the sql database
 var connection = mysql.createConnection({
     host: "localhost",
 
@@ -16,13 +18,15 @@ var connection = mysql.createConnection({
     database: "bamazon_db"
 });
 
+// Connect to the mysql server and sql database
 connection.connect(function (err) {
     if (err) throw err;
-    console.log("connected as id " + connection.threadId + "\n");
-    ask();
+    // Run the start function after the connection is made to prompt the user
+    start();
 });
 
-function ask() {
+// Prompts the user to select an action
+function start() {
     inquirer.prompt(
         {
             name: "action",
@@ -58,6 +62,7 @@ function ask() {
     });
 };
 
+// View products for sale
 function viewProducts() {
     connection.query("SELECT * FROM products", function (error, response) {
         if (error) throw error;
@@ -66,14 +71,16 @@ function viewProducts() {
             console.log("Product ID: " + response[i].item_id + " || Product name: " + response[i].product_name + " || Department: " + response[i].department_name + " || Price: $" + response[i].price + " || Stock quantity: " + response[i].stock_quantity);
         }
         console.log("------------------------\n");
-        ask();
+        // Prompt the user to select another action
+        start();
     });
 }
 
+// If there are fewer than five items of any product, display that product
 function viewLowInventory() {
     connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (error, response) {
         if (error) throw error;
-
+        // If there are no such items
         if (response.length === 0) {
             console.log("\nThere are no items in low stock!\n");
         }
@@ -86,10 +93,12 @@ function viewLowInventory() {
             }
             console.log("------------------------\n");
         }
-        ask();
+        // Prompt the user to select another action
+        start();
     });
 }
 
+// Allow the user to restock an item of their choice
 function addInventory() {
     connection.query("SELECT product_name, stock_quantity FROM products", function (error, response) {
         if (error) throw error;
@@ -98,6 +107,7 @@ function addInventory() {
             {
                 name: "choice",
                 type: "list",
+                // Allows the user to select an item by name rather than ID, cause why not
                 choices: function () {
                     var choiceArray = [];
                     for (var i = 0; i < response.length; i++) {
@@ -113,6 +123,7 @@ function addInventory() {
                 message: "How much would you like to add to this item's inventory?"
             }
         ]).then(function (answer) {
+            // Determines which item id corresponds to the user's selection
             var chosenIndex;
             for (var i = 0; i < response.length; i++) {
                 if (response[i].product_name === answer.choice) {
@@ -120,6 +131,7 @@ function addInventory() {
                 }
             }
             var selectedId = chosenIndex + 1;
+            // Restock
             connection.query(
                 "UPDATE products SET ? where ?",
                 [
@@ -133,13 +145,15 @@ function addInventory() {
                 function (error) {
                     if (error) throw error;
                     console.log("\nItem successfully restocked!\n");
-                    ask();
+                    // Prompt the user to select another action
+                    start();
                 }
             )
         });
     })
 };
 
+// Allows user to add a completely new product to the table
 function addProduct() {
         inquirer.prompt([
             {
@@ -187,8 +201,10 @@ function addProduct() {
                 function (error) {
                     if (error) throw error;
                     console.log("\nItem successfully added!\n");
-                    ask();
+                    // Prompt the user to select another action
+                    start();
                 }
             )
         });
 };
+
